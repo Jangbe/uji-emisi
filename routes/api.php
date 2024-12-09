@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\EmissionTestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +22,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('dashboard-guest', DashboardController::class);
+
+Route::post('login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('emission-test', EmissionTestController::class)->except('show');
+    Route::get('emission-test/{nopol:vehicle}', [EmissionTestController::class, 'vehicle']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});

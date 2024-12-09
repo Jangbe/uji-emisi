@@ -7,7 +7,6 @@ use App\Models\UjiEmisi;
 use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use Codedge\Fpdf\Fpdf\Fpdf;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
 
 // use Illuminate\Support\Facades\Session;
@@ -70,18 +69,13 @@ class KendaraanUjiEmisiController extends Controller
         // $ujiemisi = UjiEmisi::findOrFail($ujiemisi_id);
         $ujiemisi = UjiEmisi::findOrFail($ujiemisi_id);
         $validatedData = $request->validate([
-            'no_sertifikat' => [
-                'required',
-                Rule::unique('uji_emisis'),
-            ],
+            'no_sertifikat' => 'required|unique:uji_emisis,no_sertifikat,' . $ujiemisi_id,
         ], [
             'no_sertifikat.required' => 'Nomor seri tanda lulus harus diisi.',
             'no_sertifikat.unique' => 'Nomor seri tanda lulus telah digunakan.',
         ]);
 
         $ujiemisi->update($validatedData);
-
-
 
         $message = new HtmlString("Kendaraan dengan nomor polisi {$ujiemisi->kendaraan->nopol} dinyatakan <strong>lulus</strong> uji emisi");
         // return redirect('/dashboard/ujiemisi')->with('success', $message);
