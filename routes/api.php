@@ -25,7 +25,7 @@ Route::get('dashboard-guest', DashboardController::class);
 
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('emission-test/{nopol}', [EmissionTestController::class, 'vehicle']);
     Route::apiResource('emission-test', EmissionTestController::class)->except('show');
-    Route::get('emission-test/{vehicle:nopol}', [EmissionTestController::class, 'vehicle']);
     Route::post('logout', [AuthController::class, 'logout']);
 });

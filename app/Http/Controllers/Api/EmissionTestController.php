@@ -120,8 +120,16 @@ class EmissionTestController extends Controller
     /**
      * Display the specified resource.
      */
-    public function vehicle(Kendaraan $vehicle)
+    public function vehicle($nopol)
     {
+        $vehicle = Kendaraan::where('nopol', $nopol)->first();
+        if (is_null($vehicle)) return response()->json([
+            'meta' => [
+                'status' => 404,
+                'message' => 'Kendaraan tidak ditemukan'
+            ],
+            'data' => new Kendaraan()
+        ]);
         return response()->json([
             'meta' => [
                 'status' => 200,
