@@ -31,11 +31,11 @@ class EmissionTestController extends Controller
     public function store(Request $request)
     {
         $valid = Validator::make($request->all(), [
-            'nopol' => '',
+            'nopol' => 'required',
             'merk' => '',
             'tipe' => '',
-            'tahun' => '|gt:1900',
-            'cc' => '|gt:100',
+            'tahun' => 'gt:1900',
+            'cc' => 'gt:100',
             'no_rangka' => '',
             'no_mesin' => '',
             'kendaraan_kategori' => '',
@@ -51,6 +51,7 @@ class EmissionTestController extends Controller
             'temperatur' => 'nullable|numeric|between:10,150',
             'lambda' => 'nullable|numeric|between:0.5,5',
         ], [
+            'nopol.required' => 'Nopol harus diisi',
             'tahun.gt' => 'Tahun kendaraan harus lebih besar dari 1900',
             'cc.gt' => 'Kapasitas mesin (CC) harus lebih besar dari 100',
             'odometer.required' => 'Odometer kendaraan harus diisi',
@@ -81,6 +82,7 @@ class EmissionTestController extends Controller
             'data' => $valid->messages()->toArray()
         ]);
 
+        $valid = $valid->validate();
         $kendaraan = Kendaraan::where('nopol', $valid['nopol'])->first();
 
         // Jika kendaraan belum ada, buat baru
@@ -123,11 +125,11 @@ class EmissionTestController extends Controller
     public function update(Request $request, UjiEmisi $emissionTest)
     {
         $valid = Validator::make($request->all(), [
-            'nopol' => '',
+            'nopol' => 'required',
             'merk' => '',
             'tipe' => '',
-            'tahun' => '|gt:1900',
-            'cc' => '|gt:100',
+            'tahun' => 'gt:1900',
+            'cc' => 'gt:100',
             'no_rangka' => '',
             'no_mesin' => '',
             'kendaraan_kategori' => '',
@@ -143,6 +145,7 @@ class EmissionTestController extends Controller
             'temperatur' => 'nullable|numeric|between:10,150',
             'lambda' => 'nullable|numeric|between:0.5,5',
         ], [
+            'nopol.required' => 'Nopol harus diisi',
             'tahun.gt' => 'Tahun kendaraan harus lebih besar dari 1900',
             'cc.gt' => 'Kapasitas mesin (CC) harus lebih besar dari 100',
             'odometer.required' => 'Odometer kendaraan harus diisi',
@@ -174,6 +177,7 @@ class EmissionTestController extends Controller
             'data' => $valid->messages()->toArray()
         ]);
 
+        $valid = $valid->validate();
         $kendaraan = Kendaraan::where('nopol', $valid['nopol'])->first();
 
         // Jika kendaraan belum ada, buat baru
