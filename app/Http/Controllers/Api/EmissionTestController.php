@@ -74,6 +74,20 @@ class EmissionTestController extends Controller
             'lambda.numeric' => 'Nilai Lambda harus berupa angka',
             'lambda.between' => 'Nilai Lambda harus antara 0.5 sampai 5',
         ]);
+        $kendaraan = Kendaraan::where('nopol', $request->nopol)->first();
+        if (is_null($kendaraan)) {
+            $valid->addRules([
+                'merk' => 'required',
+                'tipe' => 'required',
+                'cc' => 'required',
+                'tahun' => 'required',
+                'kendaraan_kategori' => 'required',
+                'no_rangka' => 'required',
+                'no_mesin' => 'required',
+                'bahan_bakar' => 'required'
+            ]);
+        }
+
         if ($valid->fails()) return response()->json([
             'meta' => [
                 'status' => 422,
@@ -83,8 +97,6 @@ class EmissionTestController extends Controller
         ]);
 
         $valid = $valid->validate();
-        $kendaraan = Kendaraan::where('nopol', $valid['nopol'])->first();
-
         // Jika kendaraan belum ada, buat baru
         if (!$kendaraan) {
             $valid['user_id'] = auth()->id();
@@ -125,15 +137,6 @@ class EmissionTestController extends Controller
     public function update(Request $request, UjiEmisi $emissionTest)
     {
         $valid = Validator::make($request->all(), [
-            'nopol' => 'required',
-            'merk' => '',
-            'tipe' => '',
-            'tahun' => 'gt:1900',
-            'cc' => 'gt:100',
-            'no_rangka' => '',
-            'no_mesin' => '',
-            'kendaraan_kategori' => '',
-            'bahan_bakar' => '',
             'odometer' => 'required',
             'co' => 'numeric|between:0,9.99',
             'hc' => 'integer|between:0,9999',
@@ -145,9 +148,6 @@ class EmissionTestController extends Controller
             'temperatur' => 'nullable|numeric|between:10,150',
             'lambda' => 'nullable|numeric|between:0.5,5',
         ], [
-            'nopol.required' => 'Nopol harus diisi',
-            'tahun.gt' => 'Tahun kendaraan harus lebih besar dari 1900',
-            'cc.gt' => 'Kapasitas mesin (CC) harus lebih besar dari 100',
             'odometer.required' => 'Odometer kendaraan harus diisi',
             'co.numeric' => 'Nilai CO harus berupa angka',
             'co.between' => 'Nilai CO harus antara 0 sampai 9.99',
@@ -177,19 +177,9 @@ class EmissionTestController extends Controller
             'data' => $valid->messages()->toArray()
         ]);
 
-        $valid = $valid->validate();
-        $kendaraan = Kendaraan::where('nopol', $valid['nopol'])->first();
-
-        // Jika kendaraan belum ada, buat baru
-        if (!$kendaraan) {
-            $valid['user_id'] = auth()->id();
-            $kendaraan = Kendaraan::create($valid);
-        } else $kendaraan->update($valid);
-
         // Tambahkan data uji emisi dengan kendaraan yang ada (baik yang sudah ada atau baru dibuat)
-        $ujiEmisiData = $valid;
+        $ujiEmisiData = $valid->validate();
         $ujiEmisiData['user_id'] = auth()->id();
-        $ujiEmisiData['kendaraan_id'] = $kendaraan->id;
         $emissionTest->update($ujiEmisiData);
         return response()->json([
             'meta' => [
